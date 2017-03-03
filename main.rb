@@ -3,6 +3,25 @@ require 'json'
 require 'uri'
 require 'net/http'
 
+
+def main()
+    num, expressions = parse_expressions
+
+    to_send = {"expressions" => expressions}
+    response = make_request(to_send)
+
+    case response
+    when Net::HTTPSuccess, Net::HTTPRedirection
+        data = JSON.parse(response.body)
+        data['results'].each do |result|
+            print "#{ result['result']} #{ result['time']} \n"
+        end
+    else
+        print "You have error in you stdin data\n"
+    end
+end
+
+
 def parse_expressions()
     num = 0
     expressions = []
@@ -34,17 +53,6 @@ def make_request(data)
     return response
 end
 
-num, expressions = parse_expressions
-
-to_send = {"expressions" => expressions}
-response = make_request(to_send)
-
-case response
-when Net::HTTPSuccess, Net::HTTPRedirection
-    data = JSON.parse(response.body)
-    data['results'].each do |result|
-        print "#{ result['result']} #{ result['time']} \n"
-    end
-else
-    print "You have error in you stdin data\n"
+if __FILE__ == $0
+    main
 end
