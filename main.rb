@@ -7,9 +7,13 @@ require 'net/http'
 def main()
     num, expressions = parse_expressions
 
+    if num != expressions.length || num == 0
+        print "Not enought expressions in stdin\n"
+        return
+    end
+
     to_send = {"expressions" => expressions}
     response = make_request(to_send)
-
     if response.code == '200'
         data = JSON.parse(response.body)
         data['results'].each do |result|
@@ -43,7 +47,7 @@ def parse_expressions()
 end
 
 def make_request(data)
-    uri = URI.parse("http://127.0.0.1:8000/")
+    uri = URI.parse("http://127.0.0.1:8000/calculate/")
     header = {'Content-Type' => 'application/json'}
     # Create the HTTP objects
     http = Net::HTTP.new(uri.host, uri.port)
