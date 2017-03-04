@@ -1,7 +1,18 @@
-#!/usr/bin/env ruby
 require 'json'
 require 'uri'
 require 'net/http'
+require 'optparse'
+
+# Use default api_url that will point on localhost
+OPTIONS = {
+    'api_uri' => "http://127.0.0.1:8000"
+}
+
+OptionParser.new do |parser|
+  parser.on("-u", "--uri [URI]", String, "URI to reverse polish notation API") do |uri|
+    OPTIONS['api_uri'] = uri
+  end
+end.parse!
 
 
 def main()
@@ -14,6 +25,8 @@ def main()
 
     to_send = {"expressions" => expressions}
     response = make_request(to_send)
+
+    # Parse response and prepare content to stdout
     if response.code == '200'
         data = JSON.parse(response.body)
         data['results'].each do |result|
@@ -23,7 +36,7 @@ def main()
         data = JSON.parse(response.body)
         print data['msg'] + "\n"
     else
-        print "You have error in you stdin data\n"
+        print response.body
     end
 end
 
@@ -43,11 +56,11 @@ def parse_expressions()
         end
     end
     return num, expressions
-
 end
 
 def make_request(data)
-    uri = URI.parse("http://127.0.0.1:8000/calculate/")
+    # Prepare URI
+    uri = URI.join(OPTIONS['api_uri'], "/calculate/")
     header = {'Content-Type' => 'application/json'}
     # Create the HTTP objects
     http = Net::HTTP.new(uri.host, uri.port)
@@ -56,6 +69,7 @@ def make_request(data)
 
     # Send the request
     response = http.request(request)
+    
     return response
 end
 
