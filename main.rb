@@ -9,6 +9,7 @@ OPTIONS = {
 }
 
 OptionParser.new do |parser|
+  parser.banner = "Usage: main.rb [options] expressions_file"
   parser.on("-u", "--uri [URI]", String, "URI to reverse polish notation API") do |uri|
     OPTIONS['api_uri'] = uri
   end
@@ -69,7 +70,7 @@ def make_request(data)
 
     # Send the request
     response = http.request(request)
-    
+
     return response
 end
 
