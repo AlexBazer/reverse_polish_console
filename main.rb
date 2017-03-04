@@ -10,12 +10,14 @@ def main()
     to_send = {"expressions" => expressions}
     response = make_request(to_send)
 
-    case response
-    when Net::HTTPSuccess, Net::HTTPRedirection
+    if response.code == '200'
         data = JSON.parse(response.body)
         data['results'].each do |result|
             print "#{ result['result']} #{ result['time']} \n"
         end
+    elsif response.code == '400'
+        data = JSON.parse(response.body)
+        print data['msg'] + "\n"
     else
         print "You have error in you stdin data\n"
     end
